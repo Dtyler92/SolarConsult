@@ -469,7 +469,7 @@
     <a href="#lead">Get a free estimate</a>
   </div>
 
-<script>
+  <script>
 const scriptURL = "https://script.google.com/macros/s/AKfycbyikqc2IHLpPse4fZLpxV9bEZVXGRPAWrILM1CHmF4SlFC5BJkfE6k9FYPLaG1hf_GL/exec";
 
 const form = document.getElementById("leadForm");
@@ -485,22 +485,22 @@ form.addEventListener("submit", async (e) => {
   submitBtn.disabled = true;
   submitBtn.textContent = "Sending...";
 
-  const payload = {
+  const payload = new URLSearchParams({
     name: document.getElementById("name").value.trim(),
     phone: document.getElementById("phone").value.trim(),
     email: document.getElementById("email").value.trim(),
     address: document.getElementById("address").value.trim(),
     zip: document.getElementById("zip").value.trim(),
     note: document.getElementById("note").value.trim()
-  };
+  });
 
   try {
     const res = await fetch(scriptURL, {
       method: "POST",
-      body: JSON.stringify(payload)
+      body: payload
     });
 
-    // Try to read JSON if allowed; if not, still succeed on 200-299.
+    // Apps Script should return JSON; but if the browser blocks reading it, still succeed on ok
     let data = null;
     try { data = await res.json(); } catch (_) {}
 
