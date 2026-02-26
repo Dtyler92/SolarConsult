@@ -116,6 +116,7 @@
       background:rgba(255,255,255,.04);
       font-weight:700;font-size:.9rem;
     }
+    .badge svg{opacity:.95}
 
     .bullets{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:10px}
     .bullets li{display:flex;gap:10px;align-items:flex-start}
@@ -132,7 +133,7 @@
     .lead p{margin:0 0 12px;color:var(--muted);font-size:.95rem}
 
     label{display:block;margin:10px 0 6px;color:var(--muted);font-size:.9rem}
-    input, textarea{
+    input, textarea, select{
       width:100%;padding:12px;border-radius:12px;
       border:1px solid var(--border);
       background:rgba(8,12,24,.55);
@@ -140,7 +141,6 @@
     }
     textarea{min-height:92px;resize:vertical}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-
     .btn{
       width:100%;margin-top:12px;
       padding:12px 14px;border-radius:14px;border:none;
@@ -148,7 +148,6 @@
       background:var(--accent);color:#1b1209;
       font-size:1rem;
     }
-
     .fine{
       margin-top:10px;
       color:rgba(238,242,255,.62);
@@ -209,6 +208,7 @@
       border-top:1px solid var(--border);
       backdrop-filter: blur(10px);
       display:none;
+      z-index: 20;
     }
     .sticky a{
       display:block;text-align:center;text-decoration:none;
@@ -217,90 +217,106 @@
       color:#1b1209;font-weight:900;
     }
 
-    /* --- Homeowner/Renter pills --- */
-    .choiceRow{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin:6px 0 2px;
-    }
-    .choice{
-      flex:1 1 140px;
-      display:flex;
-      align-items:center;
-      gap:10px;
-      padding:12px;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.04);
-      cursor:pointer;
-      user-select:none;
-    }
-    .choice input{width:auto}
-    .choice span{font-weight:800}
-
-    /* --- Video modal --- */
+    /* ---- Modal (Renter Video) ---- */
     .modalOverlay{
       position:fixed; inset:0;
-      background:rgba(0,0,0,.72);
       display:none;
       align-items:center;
       justify-content:center;
       padding:18px;
-      z-index:9999;
+      background:rgba(0,0,0,.65);
+      z-index: 50;
+
+      opacity: 0;
+      transition: opacity 280ms ease;
     }
+    .modalOverlay.show{ opacity: 1; }
+
     .modal{
       width:min(920px, 100%);
-      background:rgba(11,18,32,.95);
+      background:rgba(15,26,50,.96);
       border:1px solid var(--border);
       border-radius:18px;
-      box-shadow:var(--shadow);
+      box-shadow: var(--shadow);
       overflow:hidden;
     }
     .modalHeader{
       display:flex;
-      justify-content:space-between;
       align-items:center;
-      gap:12px;
+      justify-content:space-between;
+      gap:10px;
       padding:14px 16px;
-      border-bottom:1px solid var(--border);
+      border-bottom:1px solid rgba(255,255,255,.10);
     }
-    .modalHeader strong{font-size:1.02rem}
     .closeBtn{
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.06);
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.16);
       color:var(--text);
-      border-radius:12px;
       padding:8px 10px;
+      border-radius:12px;
       cursor:pointer;
-      font-weight:900;
+      font-weight:800;
     }
     .videoWrap{
       position:relative;
       width:100%;
-      aspect-ratio: 16/9;
+      aspect-ratio: 16 / 9;
       background:#000;
+
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 420ms ease, transform 420ms ease;
+    }
+    .modalOverlay.show .videoWrap{
+      opacity: 1;
+      transform: translateY(0);
     }
     .videoWrap iframe{
       position:absolute; inset:0;
       width:100%; height:100%;
       border:0;
     }
-    .modalFooter{
-      padding:14px 16px 18px;
-      border-top:1px solid var(--border);
+
+    .unmuteOverlay{
+      position:absolute; inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      background:linear-gradient(180deg, rgba(0,0,0,.45), rgba(0,0,0,.15));
     }
-    .modalFooter p{margin:0 0 10px;color:var(--muted)}
-    .ctaBtn{
-      display:block;
-      width:100%;
-      text-align:center;
-      text-decoration:none;
-      padding:12px 14px;
+    .unmuteBtn{
+      border:none;
       border-radius:14px;
+      padding:12px 14px;
       background:var(--accent);
       color:#1b1209;
       font-weight:900;
+      cursor:pointer;
+      box-shadow: var(--shadow);
+    }
+    .unmuteHint{
+      display:block;
+      margin-top:8px;
+      text-align:center;
+      color:rgba(238,242,255,.85);
+      font-size:.9rem;
+    }
+
+    .modalFooter{
+      padding:14px 16px 18px;
+      border-top:1px solid rgba(255,255,255,.10);
+      color:var(--muted);
+    }
+    .modalFooter p{ margin:0 0 10px; }
+    .ctaBtn{
+      display:inline-block;
+      text-decoration:none;
+      background:var(--accent);
+      color:#1b1209;
+      font-weight:900;
+      padding:12px 14px;
+      border-radius:14px;
     }
 
     @media(max-width:980px){
@@ -351,9 +367,26 @@
         </p>
 
         <div class="badges">
-          <div class="badge">Warranty-backed equipment</div>
-          <div class="badge">Installation handled in-house</div>
-          <div class="badge">Quick consult, clear next steps</div>
+          <div class="badge">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 2l8 4v7c0 5-3.4 9.4-8 10-4.6-.6-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Warranty-backed equipment
+          </div>
+          <div class="badge">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M14 7l3 3-8 8H6v-3l8-8z" stroke="currentColor" stroke-width="2"/>
+              <path d="M16 5l3 3" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Installation handled in-house
+          </div>
+          <div class="badge">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Quick consult, clear next steps
+          </div>
         </div>
 
         <ul class="bullets">
@@ -376,17 +409,12 @@
             <label>Website <input type="text" name="website" id="website" tabindex="-1" autocomplete="off"></label>
           </div>
 
-          <label>Are you a homeowner or renter?</label>
-          <div class="choiceRow">
-            <label class="choice">
-              <input type="radio" name="tenure" value="Homeowner" required>
-              <span>Homeowner</span>
-            </label>
-            <label class="choice">
-              <input type="radio" name="tenure" value="Renter" required>
-              <span>Renter</span>
-            </label>
-          </div>
+          <label for="occupancy">Are you a homeowner or renter?</label>
+          <select id="occupancy" name="occupancy" required>
+            <option value="" selected disabled>Select one…</option>
+            <option value="homeowner">Homeowner</option>
+            <option value="renter">Renter</option>
+          </select>
 
           <label for="name">Full Name</label>
           <input id="name" name="name" placeholder="John Smith" required />
@@ -420,7 +448,9 @@
 
           <div id="thanks" style="display:none;margin-top:12px;padding:12px;border-radius:14px;border:1px solid var(--border);background:rgba(53,208,186,.10);">
             <strong>Thanks — we received your request ✅</strong>
-            <div id="thanksMsg" style="color:var(--muted);margin-top:4px;"></div>
+            <div id="thanksMsg" style="color:var(--muted);margin-top:4px;">
+              We’ll reach out to confirm details and answer questions.
+            </div>
           </div>
 
           <div id="errorBox" style="display:none;margin-top:12px;padding:12px;border-radius:14px;border:1px solid rgba(244,162,97,.5);background:rgba(244,162,97,.12);">
@@ -435,10 +465,16 @@
       </div>
     </div>
 
-    <!-- detailed info below (kept) -->
+    <!-- More detailed info (bottom) -->
     <div class="section">
       <div class="card mini" id="about">
-        <div class="icon" aria-hidden="true">🏢</div>
+        <div class="icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M4 22V2h10v20" stroke="currentColor" stroke-width="2"/>
+            <path d="M14 9h6v13" stroke="currentColor" stroke-width="2"/>
+            <path d="M7 6h4M7 10h4M7 14h4M7 18h4" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </div>
         <h3>Palmetto Solar overview</h3>
         <p>
           Palmetto Solar is an established solar company with regional presence and local support.
@@ -447,7 +483,11 @@
       </div>
 
       <div class="card mini">
-        <div class="icon" aria-hidden="true">🤝</div>
+        <div class="icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M13 2L3 14h7l-1 8 12-14h-7l-1-6z" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </div>
         <h3>No-pressure process</h3>
         <p>
           We can do a quick virtual call or a short visit. If we schedule a brief meeting, it helps to have all decision-makers present
@@ -456,7 +496,12 @@
       </div>
 
       <div class="card mini">
-        <div class="icon" aria-hidden="true">🔁</div>
+        <div class="icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M21 12a9 9 0 1 1-2.6-6.4" stroke="currentColor" stroke-width="2"/>
+            <path d="M21 3v7h-7" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </div>
         <h3>Credits & rollover</h3>
         <p>
           Your system generates power during the day. Excess energy can be sent to the grid for credits,
@@ -549,6 +594,7 @@
         <strong>Renters: Here’s a quick way to lower your electric bill</strong>
         <button class="closeBtn" type="button" id="closeVideoBtn">Close ✕</button>
       </div>
+
       <div class="videoWrap">
         <iframe
           id="ytFrame"
@@ -556,7 +602,15 @@
           allow="autoplay; encrypted-media"
           allowfullscreen>
         </iframe>
+
+        <div class="unmuteOverlay" id="unmuteOverlay">
+          <div style="text-align:center;">
+            <button type="button" class="unmuteBtn" id="unmuteBtn">Tap to unmute 🔊</button>
+            <span class="unmuteHint">Audio starts when you tap (browser requirement).</span>
+          </div>
+        </div>
       </div>
+
       <div class="modalFooter">
         <p>Tap below to get started:</p>
         <a class="ctaBtn" href="https://get.thinkenergy.com/Tourbillon" target="_blank" rel="noopener">Lower my electric bill</a>
@@ -564,113 +618,196 @@
     </div>
   </div>
 
-  <script>
-    // ✅ Your Apps Script Web App /exec URL:
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwgJ1czBkad75OXkxhkXd401qD2h5IRkfkOzVSQWA8JfIlcCFHXYquHUJ5AdJ_S_JUI/exec";
+<script>
+  // ✅ Paste your actual Apps Script Web App /exec URL here:
+  const scriptURL = "https://script.google.com/macros/s/AKfycbwgJ1czBkad75OXkxhkXd401qD2h5IRkfkOzVSQWA8JfIlcCFHXYquHUJ5AdJ_S_JUI/exec";
 
-    // YouTube video ID (from your link)
-    const YT_ID = "3u5DALLHZDI";
-    const YT_EMBED = `https://www.youtube.com/embed/${YT_ID}?autoplay=1&mute=1&rel=0`;
+  // YouTube renter video
+  const YT_ID = "3u5DALLHZDI";
+  const YT_EMBED_MUTED = `https://www.youtube.com/embed/${YT_ID}?autoplay=1&mute=1&rel=0&playsinline=1&enablejsapi=1`;
 
-    const form = document.getElementById("leadForm");
-    const thanks = document.getElementById("thanks");
-    const thanksMsg = document.getElementById("thanksMsg");
-    const errorBox = document.getElementById("errorBox");
-    const submitBtn = document.getElementById("submitBtn");
+  const form = document.getElementById("leadForm");
+  const thanks = document.getElementById("thanks");
+  const thanksMsg = document.getElementById("thanksMsg");
+  const errorBox = document.getElementById("errorBox");
+  const submitBtn = document.getElementById("submitBtn");
+  const errorMsgEl = document.querySelector("#errorBox div");
 
-    const videoOverlay = document.getElementById("videoOverlay");
-    const ytFrame = document.getElementById("ytFrame");
-    const closeVideoBtn = document.getElementById("closeVideoBtn");
+  // Modal elements
+  const videoOverlay = document.getElementById("videoOverlay");
+  const ytFrame = document.getElementById("ytFrame");
+  const closeVideoBtn = document.getElementById("closeVideoBtn");
+  const unmuteOverlay = document.getElementById("unmuteOverlay");
+  const unmuteBtn = document.getElementById("unmuteBtn");
 
-    function inEasternBusinessHours() {
-      const fmt = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", hour12: false });
-      const hour = parseInt(fmt.format(new Date()), 10);
-      return hour >= 9 && hour < 21; // 9:00–20:59 ET
+  function inEasternWindow9to9() {
+    // Determine current hour in America/New_York without external libs
+    try {
+      const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/New_York",
+        hour: "numeric",
+        hour12: false
+      }).formatToParts(new Date());
+      const hour = Number(parts.find(p => p.type === "hour").value);
+      return hour >= 9 && hour < 21;
+    } catch (e) {
+      // Fallback: use local time (still usually Eastern for you)
+      const hour = new Date().getHours();
+      return hour >= 9 && hour < 21;
     }
+  }
 
-    function openVideoModal() {
-      ytFrame.src = YT_EMBED;
-      videoOverlay.style.display = "flex";
-      videoOverlay.setAttribute("aria-hidden", "false");
-    }
+  function openVideoModal() {
+    ytFrame.src = YT_EMBED_MUTED;
+    videoOverlay.style.display = "flex";
+    requestAnimationFrame(() => videoOverlay.classList.add("show"));
+    videoOverlay.setAttribute("aria-hidden", "false");
+    unmuteOverlay.style.display = "flex";
+  }
 
-    function closeVideoModal() {
+  function closeVideoModal() {
+    videoOverlay.classList.remove("show");
+    videoOverlay.setAttribute("aria-hidden", "true");
+    setTimeout(() => {
       videoOverlay.style.display = "none";
-      videoOverlay.setAttribute("aria-hidden", "true");
-      ytFrame.src = ""; // stop playback
+      ytFrame.src = "";
+    }, 220);
+  }
+
+  closeVideoBtn.addEventListener("click", closeVideoModal);
+  videoOverlay.addEventListener("click", (e) => {
+    if (e.target === videoOverlay) closeVideoModal();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && videoOverlay.style.display === "flex") closeVideoModal();
+  });
+
+  // Tap to unmute + volume ramp
+  unmuteBtn.addEventListener("click", () => {
+    try {
+      ytFrame.contentWindow.postMessage(JSON.stringify({
+        event: "command",
+        func: "unMute",
+        args: []
+      }), "*");
+
+      let currentVolume = 10; // start gentle
+      ytFrame.contentWindow.postMessage(JSON.stringify({
+        event: "command",
+        func: "setVolume",
+        args: [currentVolume]
+      }), "*");
+
+      ytFrame.contentWindow.postMessage(JSON.stringify({
+        event: "command",
+        func: "playVideo",
+        args: []
+      }), "*");
+
+      const targetVolume = 60;
+      const step = 5;
+      const intervalMs = 150;
+
+      const rampInterval = setInterval(() => {
+        currentVolume += step;
+        ytFrame.contentWindow.postMessage(JSON.stringify({
+          event: "command",
+          func: "setVolume",
+          args: [currentVolume]
+        }), "*");
+
+        if (currentVolume >= targetVolume) clearInterval(rampInterval);
+      }, intervalMs);
+
+    } catch (_) {}
+
+    unmuteOverlay.style.display = "none";
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    thanks.style.display = "none";
+    errorBox.style.display = "none";
+
+    errorMsgEl.innerHTML = `Please try again, or contact us directly:
+      <a href="mailto:tyler@tourbillionenergy.com">tyler@tourbillionenergy.com</a> •
+      <a href="tel:+17176687720">717-668-7720</a>`;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending...";
+
+    const occupancy = document.getElementById("occupancy").value;
+    const websiteTrap = document.getElementById("website").value.trim();
+
+    // If bot filled honeypot, silently "succeed" but do nothing
+    if (websiteTrap) {
+      thanksMsg.textContent = "Thanks — we received your request ✅";
+      thanks.style.display = "block";
+      form.reset();
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Send my info";
+      return;
     }
 
-    closeVideoBtn.addEventListener("click", closeVideoModal);
-    videoOverlay.addEventListener("click", (e) => {
-      if (e.target === videoOverlay) closeVideoModal();
+    // Renter flow: show video + CTA, DO NOT send to Apps Script
+    if (occupancy === "renter") {
+      openVideoModal();
+      // Also show a friendly confirmation (optional)
+      thanksMsg.textContent = "Thanks! Since you’re renting, here’s a quick option to lower your electric bill.";
+      thanks.style.display = "block";
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Send my info";
+      return;
+    }
+
+    // Homeowner flow: submit to Apps Script
+    const payload = new URLSearchParams({
+      website: websiteTrap,
+      occupancy: occupancy,
+      name: document.getElementById("name").value.trim(),
+      phone: document.getElementById("phone").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      address: document.getElementById("address").value.trim(),
+      zip: document.getElementById("zip").value.trim(),
+      note: document.getElementById("note").value.trim()
     });
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && videoOverlay.style.display === "flex") closeVideoModal();
-    });
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      thanks.style.display = "none";
-      errorBox.style.display = "none";
+    try {
+      const res = await fetch(scriptURL, { method: "POST", body: payload });
+      const text = await res.text();
+      const t = text.trim();
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Sending...";
+      // If Apps Script returns HTML, it's usually deployment/access settings
+      if (t.startsWith("<!DOCTYPE") || t.startsWith("<html")) {
+        throw new Error("Apps Script returned an HTML page. Check deployment: Execute as 'Me' and access 'Anyone', then redeploy.");
+      }
 
-      const tenureEl = form.querySelector('input[name="tenure"]:checked');
-      const tenure = tenureEl ? tenureEl.value : "";
+      let data = null;
+      try { data = JSON.parse(text); } catch (_) {}
 
-      // If renter: do NOT send to Apps Script — show video modal instead
-      if (tenure === "Renter") {
-        openVideoModal();
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Send my info";
+      if (res.ok && data && data.result === "success") {
+        const fastMsg = inEasternWindow9to9()
+          ? "We received your request ✅ You’ll receive a call or text within the next 5 minutes (9am–9pm Eastern)."
+          : "We received your request ✅ We’ll contact you as soon as possible (typically 9am–9pm Eastern).";
+
+        thanksMsg.textContent = fastMsg;
+        thanks.style.display = "block";
+        form.reset();
         return;
       }
 
-      // Homeowner path: submit to Apps Script
-      const payload = new URLSearchParams({
-        website: document.getElementById("website").value.trim(), // honeypot
-        tenure: tenure,
-        name: document.getElementById("name").value.trim(),
-        phone: document.getElementById("phone").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        address: document.getElementById("address").value.trim(),
-        zip: document.getElementById("zip").value.trim(),
-        note: document.getElementById("note").value.trim()
-      });
+      throw new Error((data && data.message) ? data.message : ("Unexpected response: " + text));
 
-      try {
-        const res = await fetch(scriptURL, { method: "POST", body: payload });
-        const text = await res.text();
+    } catch (err) {
+      console.log("Lead submit error:", err);
+      errorMsgEl.textContent = "Error: " + (err && err.message ? err.message : "Unknown error");
+      errorBox.style.display = "block";
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Send my info";
+    }
+  });
+</script>
 
-        const t = text.trim();
-        if (t.startsWith("<!DOCTYPE") || t.startsWith("<html")) {
-          throw new Error("Submission failed due to script permissions.");
-        }
-
-        let data = null;
-        try { data = JSON.parse(text); } catch (_) {}
-
-        if (res.ok && data && data.result === "success") {
-          thanks.style.display = "block";
-          if (inEasternBusinessHours()) {
-            thanksMsg.textContent = "You’ll receive a call or text within the next 5 minutes (9am–9pm Eastern).";
-          } else {
-            thanksMsg.textContent = "Thanks! We received your request. We’ll reach out during our next available hours (9am–9pm Eastern).";
-          }
-          form.reset();
-          return;
-        }
-
-        throw new Error((data && data.message) ? data.message : "Unexpected response.");
-
-      } catch (err) {
-        errorBox.style.display = "block";
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Send my info";
-      }
-    });
-  </script>
 </body>
 </html>
