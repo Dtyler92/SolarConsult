@@ -301,6 +301,10 @@
         </p>
 
         <form id="leadForm">
+          <!-- Honeypot field (spam trap): humans won't fill this -->
+<div style="position:absolute; left:-5000px; opacity:0; height:0; overflow:hidden;">
+  <label>Website <input type="text" name="website" id="website" tabindex="-1" autocomplete="off"></label>
+</div>
           <label for="name">Full Name</label>
           <input id="name" name="name" placeholder="John Smith" required />
 
@@ -380,6 +384,7 @@
     submitBtn.textContent = "Sending...";
 
     const payload = new URLSearchParams({
+      website: document.getElementById("website").value.trim()
       name: document.getElementById("name").value.trim(),
       phone: document.getElementById("phone").value.trim(),
       email: document.getElementById("email").value.trim(),
