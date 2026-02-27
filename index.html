@@ -439,7 +439,18 @@ src="https://www.facebook.com/tr?id=873149912409063&ev=PageView&noscript=1"
           <div class="row">
             <div>
               <label for="phone">Phone</label>
-              <input id="phone" name="phone" placeholder="(555) 555-5555" required />
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                inputmode="numeric"
+                autocomplete="tel-national"
+                placeholder="(555) 555-5555"
+                required
+                maxlength="14"
+                pattern="^\(\d{3}\) \d{3}-\d{4}$"
+                title="Enter a valid US phone number: (555) 555-5555"
+              />
             </div>
             <div>
               <label for="email">Email</label>
@@ -643,6 +654,66 @@ src="https://www.facebook.com/tr?id=873149912409063&ev=PageView&noscript=1"
   const YT_ID = "3u5DALLHZDI";
   const YT_EMBED_MUTED = `https://www.youtube.com/embed/${YT_ID}?autoplay=1&mute=1&rel=0&playsinline=1&enablejsapi=1`;
 
+  // ✅ Require exactly 10 digits (strips formatting)
+function digitsOnlyPhone10(raw) {
+  const digits = (raw || "").replace(/\D/g, "");
+  return digits.length === 10 ? digits : null;
+}
+  // -----------------------------
+// ✅ US Phone: strict validation + formatting
+// Rules enforced:
+// - US-only (10 digits)
+// - Area code first digit 2–9
+// - Exchange (middle 3) first digit 2–9
+// - Auto-format to: (XXX) XXX-XXXX
+// - Block non-numeric keystrokes (while still allowing backspace/arrows/etc.)
+// -----------------------------
+
+function phoneDigits(raw) {
+  return (raw || "").replace(/\D/g, "");
+}
+
+function isValidUS10(digits) {
+  if (!digits || digits.length !== 10) return false;
+
+  // NANP rules (common enforcement):
+  // area code NXX where N=2–9
+  // central office (exchange) NXX where N=2–9
+  const a0 = digits.charCodeAt(0) - 48; // first digit
+  const e0 = digits.charCodeAt(3) - 48; // 4th digit
+  if (a0 < 2 || a0 > 9) return false;
+  if (e0 < 2 || e0 > 9) return false;
+
+  return true;
+}
+
+function formatUSPhone(digits) {
+  // digits: string of 0-10 digits
+  const d = (digits || "").slice(0, 10);
+  const a = d.slice(0, 3);
+  const b = d.slice(3, 6);
+  const c = d.slice(6, 10);
+
+  if (d.length <= 3) return a ? `(${a}` : "";
+  if (d.length <= 6) return `(${a}) ${b}`;
+  return `(${a}) ${b}-${c}`;
+}
+
+// Allow only digits + navigation/edit keys
+function isAllowedKey(e) {
+  if (e.ctrlKey || e.metaKey) return true; // allow copy/paste/select all
+  const k = e.key;
+
+  // allow navigation/edit keys
+  const allowed = [
+    "Backspace", "Delete", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown",
+    "Home", "End", "Tab", "Enter"
+  ];
+  if (allowed.includes(k)) return true;
+
+  // allow digits only
+  return /^[0-9]$/.test(k);
+}
   const form = document.getElementById("leadForm");
   const thanks = document.getElementById("thanks");
   const thanksMsg = document.getElementById("thanksMsg");
@@ -650,6 +721,27 @@ src="https://www.facebook.com/tr?id=873149912409063&ev=PageView&noscript=1"
   const submitBtn = document.getElementById("submitBtn");
   const errorMsgEl = document.querySelector("#errorBox div");
 
+  // ✅ Phone input behavior
+const phoneEl = document.getElementById("phone");
+
+phoneEl.addEventListener("keydown", (e) => {
+  if (!isAllowedKey(e)) e.preventDefault();
+});
+
+// Handles typing, paste, autofill, mobile input, etc.
+phoneEl.addEventListener("input", () => {
+  const d = phoneDigits(phoneEl.value);
+  phoneEl.value = formatUSPhone(d);
+});
+
+// Extra paste cleanup (optional but nice)
+phoneEl.addEventListener("paste", (e) => {
+  e.preventDefault();
+  const text = (e.clipboardData || window.clipboardData).getData("text") || "";
+  const d = phoneDigits(text).slice(0, 10);
+  phoneEl.value = formatUSPhone(d);
+});
+  
   // Modal elements
   const videoOverlay = document.getElementById("videoOverlay");
   const ytFrame = document.getElementById("ytFrame");
@@ -755,7 +847,33 @@ src="https://www.facebook.com/tr?id=873149912409063&ev=PageView&noscript=1"
 
     const occupancy = document.getElementById("occupancy").value;
     const websiteTrap = document.getElementById("website").value.trim();
+    // ✅ Strict phone validation on submit
+const rawPhone = document.getElementById("phone").value;
+const digits = phoneDigits(rawPhone);
 
+// Make sure it is exactly valid US 10-digit with NANP rules
+if (!isValidUS10(digits)) {
+  errorBox.style.display = "block";
+  errorMsgEl.textContent =
+    "Please enter a valid US 10-digit phone number (example: (555) 555-5555).";
+  document.getElementById("phone").focus();
+  submitBtn.disabled = false;
+  submitBtn.textContent = "Send my info";
+  return;
+}
+
+    // ✅ Validate phone number (must be 10 digits)
+    const phoneEl = document.getElementById("phone");
+    const phoneDigits = digitsOnlyPhone10(phoneEl.value);
+
+    if (!phoneDigits) {
+      errorBox.style.display = "block";
+      errorMsgEl.textContent = "Please enter a valid 10-digit phone number.";
+      phoneEl.focus();
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Send my info";
+      return;
+    }
     // If bot filled honeypot, silently "succeed" but do nothing
     if (websiteTrap) {
       thanksMsg.textContent = "Thanks — we received your request ✅";
@@ -782,7 +900,7 @@ src="https://www.facebook.com/tr?id=873149912409063&ev=PageView&noscript=1"
       website: websiteTrap,
       occupancy: occupancy,
       name: document.getElementById("name").value.trim(),
-      phone: document.getElementById("phone").value.trim(),
+      phone: Digits,
       email: document.getElementById("email").value.trim(),
       address: document.getElementById("address").value.trim(),
       zip: document.getElementById("zip").value.trim(),
