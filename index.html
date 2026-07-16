@@ -402,9 +402,6 @@
             autocomplete="tel-national"
             placeholder="(555) 555-5555"
             required
-            maxlength="14"
-            pattern="^\(\d{3}\) \d{3}-\d{4}$"
-            title="Enter a valid US phone number: (555) 555-5555"
           />
 
           <label for="zip">ZIP Code</label>
@@ -732,13 +729,22 @@ phoneEl.addEventListener("keydown", (e) => {
   if (!isAllowedKey(e)) e.preventDefault();
 });
 
-// Handles typing, paste, autofill, mobile input, etc.
 phoneEl.addEventListener("input", () => {
   const d = phoneDigits(phoneEl.value);
   phoneEl.value = formatUSPhone(d);
 });
 
-// Extra paste cleanup (optional but nice)
+// Catch iOS autofill (fires change/blur instead of input)
+phoneEl.addEventListener("change", () => {
+  const d = phoneDigits(phoneEl.value);
+  phoneEl.value = formatUSPhone(d);
+});
+
+phoneEl.addEventListener("blur", () => {
+  const d = phoneDigits(phoneEl.value);
+  phoneEl.value = formatUSPhone(d);
+});
+
 phoneEl.addEventListener("paste", (e) => {
   e.preventDefault();
   const text = (e.clipboardData || window.clipboardData).getData("text") || "";
