@@ -408,7 +408,7 @@
           <input id="zip" name="zip" placeholder="12345" required />
 
           <label for="address">Home Address <span style="color:var(--muted);font-weight:400;font-size:.85rem;">(optional — helps us check roof/sun exposure)</span></label>
-          <input id="address" name="address" placeholder="123 Main St, City" />
+          <input id="address" name="address" placeholder="Start typing your address..." autocomplete="off" />
 
           <button class="btn" type="submit" id="submitBtn">Get My Free Savings Estimate →</button>
 
@@ -815,6 +815,26 @@ form.addEventListener("submit", async function(e) {
     submitBtn.textContent = "Get My Free Savings Estimate →";
   }
 });
+</script>
+
+<!-- Google Places Autocomplete -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8hW-T2jGUuStysNdkWgSyzfdnHIGtDPA&libraries=places&callback=initAutocomplete" async defer></script>
+<script>
+function initAutocomplete() {
+  var addressEl = document.getElementById("address");
+  if (!addressEl) return;
+  var autocomplete = new google.maps.places.Autocomplete(addressEl, {
+    types: ["address"],
+    componentRestrictions: { country: "us" },
+    fields: ["formatted_address"]
+  });
+  autocomplete.addListener("place_changed", function() {
+    var place = autocomplete.getPlace();
+    if (place && place.formatted_address) {
+      addressEl.value = place.formatted_address;
+    }
+  });
+}
 </script>
 
 </body>
