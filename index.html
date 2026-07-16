@@ -379,9 +379,9 @@
 
     <div class="hero">
       <div class="card">
-        <h1>Explore solar savings with a quick, no-pressure consultation.</h1>
+        <h1>See How Much You Could Save on Electricity with Solar — Northern Pennsylvania Homeowners</h1>
         <p class="sub">
-          Tourbillion LLC helps homeowners understand whether solar makes sense for their home — with clear answers and a simple process.
+          Tourbillion LLC helps homeowners across Northern PA understand whether solar makes financial sense — with real numbers, no pressure, and no commitment.
         </p>
 
         <div class="badges">
@@ -415,10 +415,9 @@
       </div>
 
       <div class="card lead" id="lead">
-        <h2>Request a free estimate</h2>
+        <h2>Find Out If Your Home Qualifies</h2>
         <p>
-          If you came from a Facebook/Instagram lead ad, submitting the form there is perfect.
-          If you prefer, you can leave your info here and we’ll contact you.
+          Leave your info below and Tyler will personally reach out — usually within the hour during business hours.
         </p>
 
         <form id="leadForm">
@@ -427,48 +426,27 @@
             <label>Website <input type="text" name="website" id="website" tabindex="-1" autocomplete="off"></label>
           </div>
 
-          <label for="occupancy">Are you a homeowner or renter?</label>
-          <select id="occupancy" name="occupancy" required>
-            <option value="" selected disabled>Select one…</option>
-            <option value="homeowner">Homeowner</option>
-            <option value="renter">Renter</option>
-          </select>
-
           <label for="name">Full Name</label>
           <input id="name" name="name" placeholder="John Smith" required />
 
-          <div class="row">
-            <div>
-              <label for="phone">Phone</label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                inputmode="numeric"
-                autocomplete="tel-national"
-                placeholder="(555) 555-5555"
-                required
-                maxlength="14"
-                pattern="^\(\d{3}\) \d{3}-\d{4}$"
-                title="Enter a valid US phone number: (555) 555-5555"
-              />
-            </div>
-            <div>
-              <label for="email">Email</label>
-              <input id="email" name="email" type="email" placeholder="you@email.com" required />
-            </div>
-          </div>
-
-          <label for="address">Home Address</label>
-          <input id="address" name="address" placeholder="123 Main St, City, State" />
+          <label for="phone">Phone</label>
+          <input
+            id="phone"
+            name="phone"
+            type="tel"
+            inputmode="numeric"
+            autocomplete="tel-national"
+            placeholder="(555) 555-5555"
+            required
+            maxlength="14"
+            pattern="^\(\d{3}\) \d{3}-\d{4}$"
+            title="Enter a valid US phone number: (555) 555-5555"
+          />
 
           <label for="zip">ZIP Code</label>
-          <input id="zip" name="zip" placeholder="12345" />
+          <input id="zip" name="zip" placeholder="12345" required />
 
-          <label for="note">Anything we should know?</label>
-          <textarea id="note" name="note" placeholder="Example: best time to call, roof concerns, etc."></textarea>
-
-          <button class="btn" type="submit" id="submitBtn">Send my info</button>
+          <button class="btn" type="submit" id="submitBtn">Get My Free Savings Estimate →</button>
 
           <div class="fine">
             By submitting, you agree Tourbillion LLC may contact you by call/text/email. Msg/data rates may apply.
@@ -613,7 +591,7 @@
   </div>
 
   <div class="sticky">
-    <a href="#lead">Get a free estimate</a>
+    <a href="#lead">Get My Free Savings Estimate →</a>
   </div>
 
   <!-- Video Modal -->
@@ -841,7 +819,6 @@ phoneEl.addEventListener("paste", (e) => {
     submitBtn.disabled = true;
     submitBtn.textContent = "Sending...";
 
-    const occupancy = document.getElementById("occupancy").value;
     const websiteTrap = document.getElementById("website").value.trim();
     // ✅ Strict phone validation on submit
 const rawPhone = document.getElementById("phone").value;
@@ -854,7 +831,7 @@ if (!isValidUS10(digits)) {
     "Please enter a valid US 10-digit phone number (example: (555) 555-5555).";
   document.getElementById("phone").focus();
   submitBtn.disabled = false;
-  submitBtn.textContent = "Send my info";
+  submitBtn.textContent = "Get My Free Savings Estimate →";
   return;
 }
 
@@ -864,31 +841,15 @@ if (!isValidUS10(digits)) {
       thanks.style.display = "block";
       form.reset();
       submitBtn.disabled = false;
-      submitBtn.textContent = "Send my info";
+      submitBtn.textContent = "Get My Free Savings Estimate →";
       return;
     }
 
-    // Renter flow: show video + CTA, DO NOT send to Apps Script
-    if (occupancy === "renter") {
-      openVideoModal();
-      // Also show a friendly confirmation (optional)
-      thanksMsg.textContent = "Thanks! Since you’re renting, here’s a quick option to lower your electric bill.";
-      thanks.style.display = "block";
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Send my info";
-      return;
-    }
-
-    // Homeowner flow: submit to Apps Script
+    // Submit to Apps Script
     const payload = new URLSearchParams({
-      website: websiteTrap,
-      occupancy: occupancy,
       name: document.getElementById("name").value.trim(),
       phone: digits,
-      email: document.getElementById("email").value.trim(),
-      address: document.getElementById("address").value.trim(),
       zip: document.getElementById("zip").value.trim(),
-      note: document.getElementById("note").value.trim()
     });
 
     try {
@@ -909,7 +870,7 @@ if (!isValidUS10(digits)) {
           ? "We received your request ✅ You’ll receive a call or text within the next 5 minutes (9am–9pm Eastern)."
           : "We received your request ✅ We’ll contact you as soon as possible (typically 9am–9pm Eastern).";
 
-        // ✅ Meta conversion event (only on successful homeowner submission)
+        // ✅ Meta conversion event (only on successful submission)
       if (window.fbq) fbq('track', 'Lead');
         thanksMsg.textContent = fastMsg;
         thanks.style.display = "block";
@@ -925,7 +886,7 @@ if (!isValidUS10(digits)) {
       errorBox.style.display = "block";
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = "Send my info";
+      submitBtn.textContent = "Get My Free Savings Estimate →";
     }
   });
 </script>
