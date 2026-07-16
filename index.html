@@ -426,6 +426,13 @@
             <label>Website <input type="text" name="website" id="website" tabindex="-1" autocomplete="off"></label>
           </div>
 
+          <label for="occupancy">Are you a homeowner or renter?</label>
+          <select id="occupancy" name="occupancy" required>
+            <option value="" selected disabled>Select one…</option>
+            <option value="homeowner">Homeowner</option>
+            <option value="renter">Renter</option>
+          </select>
+
           <label for="name">Full Name</label>
           <input id="name" name="name" placeholder="John Smith" required />
 
@@ -819,6 +826,7 @@ phoneEl.addEventListener("paste", (e) => {
     submitBtn.textContent = "Sending...";
 
     const websiteTrap = document.getElementById("website").value.trim();
+    const occupancy = document.getElementById("occupancy").value;
     // ✅ Strict phone validation on submit
 const rawPhone = document.getElementById("phone").value;
 const digits = phoneDigits(rawPhone);
@@ -844,7 +852,17 @@ if (!isValidUS10(digits)) {
       return;
     }
 
-    // Submit to Apps Script
+    // Renter flow: send to Think Energy, do NOT hit the Google Sheet
+    if (occupancy === "renter") {
+      openVideoModal();
+      thanksMsg.textContent = "Thanks! Since you're renting, here's a quick option to lower your electric bill.";
+      thanks.style.display = "block";
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Get My Free Savings Estimate →";
+      return;
+    }
+
+    // Homeowner flow: submit to Apps Script (Google Sheet)
     const payload = new URLSearchParams({
       name: document.getElementById("name").value.trim(),
       phone: digits,
