@@ -724,6 +724,7 @@ function isAllowedKey(e) {
   // ✅ Phone input behavior
 const phoneEl = document.getElementById("phone");
 
+if (phoneEl) {
 phoneEl.addEventListener("keydown", (e) => {
   if (!isAllowedKey(e)) e.preventDefault();
 });
@@ -741,6 +742,7 @@ phoneEl.addEventListener("paste", (e) => {
   const d = phoneDigits(text).slice(0, 10);
   phoneEl.value = formatUSPhone(d);
 });
+}
   
   // Modal elements
   const videoOverlay = document.getElementById("videoOverlay");
