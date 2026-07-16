@@ -8,17 +8,150 @@
     <meta name="facebook-domain-verification" content="w5mwz1ve3a9wzb39n04date6hl76gy" />
     <!-- Meta Pixel Code -->
     <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '873149912409063');
-    fbq('track', 'PageView');
-    </script>
+const scriptURL = "https://script.google.com/macros/s/AKfycbwgJ1czBkad75OXkxhkXd401qD2h5IRkfkOzVSQWA8JfIlcCFHXYquHUJ5AdJ_S_JUI/exec";
+const YT_ID = "3u5DALLHZDI";
+const YT_EMBED_MUTED = "https://www.youtube.com/embed/" + YT_ID + "?autoplay=1&mute=1&rel=0&playsinline=1&enablejsapi=1";
+
+function phoneDigits(raw) { return (raw || "").replace(/\D/g, ""); }
+function isValidUS10(d) {
+  if (!d || d.length !== 10) return false;
+  return (d.charCodeAt(0)-48) >= 2 && (d.charCodeAt(3)-48) >= 2;
+}
+function formatUSPhone(digits) {
+  var d = (digits || "").slice(0, 10);
+  var a = d.slice(0,3), b = d.slice(3,6), c = d.slice(6,10);
+  if (d.length <= 3) return a ? "(" + a : "";
+  if (d.length <= 6) return "(" + a + ") " + b;
+  return "(" + a + ") " + b + "-" + c;
+}
+function isAllowedKey(e) {
+  if (e.ctrlKey || e.metaKey) return true;
+  return ["Backspace","Delete","ArrowLeft","ArrowRight","ArrowUp","ArrowDown","Home","End","Tab","Enter"].includes(e.key) || /^[0-9]$/.test(e.key);
+}
+
+var phoneEl = document.getElementById("phone");
+if (phoneEl) {
+  phoneEl.addEventListener("keydown", function(e) { if (!isAllowedKey(e)) e.preventDefault(); });
+  ["input","change","blur"].forEach(function(evt) {
+    phoneEl.addEventListener(evt, function() {
+      phoneEl.value = formatUSPhone(phoneDigits(phoneEl.value));
+    });
+  });
+  phoneEl.addEventListener("paste", function(e) {
+    e.preventDefault();
+    var t = (e.clipboardData || window.clipboardData).getData("text") || "";
+    phoneEl.value = formatUSPhone(phoneDigits(t).slice(0,10));
+  });
+}
+
+var videoOverlay = document.getElementById("videoOverlay");
+var ytFrame = document.getElementById("ytFrame");
+var closeVideoBtn = document.getElementById("closeVideoBtn");
+var unmuteOverlay = document.getElementById("unmuteOverlay");
+var unmuteBtn = document.getElementById("unmuteBtn");
+
+function inEasternWindow9to9() {
+  try {
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var hour = Number(parts.find(function(p){return p.type==="hour";}).value);
+    return hour >= 9 && hour < 21;
+  } catch(e) { var h = new Date().getHours(); return h>=9&&h<21; }
+}
+function openVideoModal() {
+  ytFrame.src = YT_EMBED_MUTED;
+  videoOverlay.style.display = "flex";
+  requestAnimationFrame(function(){ videoOverlay.classList.add("show"); });
+  videoOverlay.setAttribute("aria-hidden","false");
+  unmuteOverlay.style.display = "flex";
+}
+function closeVideoModal() {
+  videoOverlay.classList.remove("show");
+  videoOverlay.setAttribute("aria-hidden","true");
+  setTimeout(function(){ videoOverlay.style.display="none"; ytFrame.src=""; }, 220);
+}
+closeVideoBtn.addEventListener("click", closeVideoModal);
+videoOverlay.addEventListener("click", function(e){ if(e.target===videoOverlay) closeVideoModal(); });
+document.addEventListener("keydown", function(e){ if(e.key==="Escape"&&videoOverlay.style.display==="flex") closeVideoModal(); });
+unmuteBtn.addEventListener("click", function(){
+  try {
+    ytFrame.contentWindow.postMessage(JSON.stringify({event:"command",func:"unMute",args:[]}),"*");
+    var vol=10;
+    ytFrame.contentWindow.postMessage(JSON.stringify({event:"command",func:"setVolume",args:[vol]}),"*");
+    ytFrame.contentWindow.postMessage(JSON.stringify({event:"command",func:"playVideo",args:[]}),"*");
+    var ramp=setInterval(function(){ vol+=5; ytFrame.contentWindow.postMessage(JSON.stringify({event:"command",func:"setVolume",args:[vol]}),"*"); if(vol>=60)clearInterval(ramp); },150);
+  } catch(_){}
+  unmuteOverlay.style.display="none";
+});
+
+var form = document.getElementById("leadForm");
+var thanks = document.getElementById("thanks");
+var thanksMsg = document.getElementById("thanksMsg");
+var errorBox = document.getElementById("errorBox");
+var errorMsgEl = document.querySelector("#errorBox div");
+var submitBtn = document.getElementById("submitBtn");
+
+form.addEventListener("submit", async function(e) {
+  e.preventDefault();
+  thanks.style.display = "none";
+  errorBox.style.display = "none";
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Sending...";
+
+  var websiteTrap = document.getElementById("website").value.trim();
+  var occupancy = document.getElementById("occupancy").value;
+  var digits = phoneDigits(document.getElementById("phone").value);
+
+  if (!isValidUS10(digits)) {
+    errorBox.style.display = "block";
+    errorMsgEl.textContent = "Please enter a valid US 10-digit phone number (example: (555) 555-5555).";
+    document.getElementById("phone").focus();
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Get My Free Savings Estimate \u2192";
+    return;
+  }
+  if (websiteTrap) {
+    thanks.style.display = "block";
+    thanksMsg.textContent = "Thanks \u2014 we received your request \u2705";
+    form.reset(); submitBtn.disabled=false; submitBtn.textContent="Get My Free Savings Estimate \u2192";
+    return;
+  }
+  if (occupancy === "renter") {
+    openVideoModal();
+    thanks.style.display="block";
+    thanksMsg.textContent="Thanks! Since you\u2019re renting, here\u2019s a quick option to lower your electric bill.";
+    submitBtn.disabled=false; submitBtn.textContent="Get My Free Savings Estimate \u2192";
+    return;
+  }
+
+  var payload = new URLSearchParams({
+    name: document.getElementById("name").value.trim(),
+    phone: digits,
+    zip: document.getElementById("zip").value.trim(),
+  });
+
+  try {
+    var res = await fetch(scriptURL, { method:"POST", body:payload });
+    var text = await res.text();
+    if (text.trim().startsWith("<!DOCTYPE")||text.trim().startsWith("<html")) throw new Error("Apps Script config error.");
+    var data = null;
+    try { data = JSON.parse(text); } catch(_){}
+    if (res.ok && data && data.result === "success") {
+      if (window.fbq) fbq("track","Lead");
+      thanksMsg.textContent = inEasternWindow9to9()
+        ? "We received your request \u2705 You\u2019ll receive a call or text within the next 5 minutes (9am\u20139pm Eastern)."
+        : "We received your request \u2705 We\u2019ll contact you as soon as possible (typically 9am\u20139pm Eastern).";
+      thanks.style.display="block"; form.reset(); return;
+    }
+    throw new Error((data&&data.message)?data.message:"Unexpected response: "+text);
+  } catch(err) {
+    errorMsgEl.innerHTML = "Please try again, or contact us: <a href='mailto:tyler@tourbillionenergy.com'>tyler@tourbillionenergy.com</a> &bull; <a href='tel:+17172561092'>(717) 256-1092</a>";
+    errorBox.style.display="block";
+  } finally {
+    submitBtn.disabled=false;
+    submitBtn.textContent="Get My Free Savings Estimate \u2192";
+  }
+});
+</script>
     <noscript><img height="1" width="1" style="display:none"
     src="https://www.facebook.com/tr?id=873149912409063&ev=PageView&noscript=1"
     /></noscript>
@@ -940,8 +1073,8 @@ if (!isValidUS10(digits)) {
 }); // end DOMContentLoaded
 </script>
 
+  <p style="text-align:center; margin-top:40px; color:rgba(238,242,255,.5); font-size:.85rem;">
+    <a href="/SolarConsult/privacy-policy.html" style="color:rgba(238,242,255,.5);">Privacy Policy</a>
+  </p>
 </body>
 </html>
-<p style="text-align:center; margin-top:40px;">
-  <a href="/SolarConsult/privacy-policy.html">Privacy Policy</a>
-</p>
