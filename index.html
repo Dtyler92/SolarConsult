@@ -407,6 +407,9 @@
           <label for="zip">ZIP Code</label>
           <input id="zip" name="zip" placeholder="12345" required />
 
+          <label for="address">Home Address <span style="color:var(--muted);font-weight:400;font-size:.85rem;">(optional — helps us check roof/sun exposure)</span></label>
+          <input id="address" name="address" placeholder="123 Main St, City" />
+
           <button class="btn" type="submit" id="submitBtn">Get My Free Savings Estimate →</button>
 
           <div class="fine">
@@ -782,7 +785,8 @@ form.addEventListener("submit", async function(e) {
   var payload = new URLSearchParams({
     name: document.getElementById("name").value.trim(),
     phone: digits,
-    zip: document.getElementById("zip").value.trim()
+    zip: document.getElementById("zip").value.trim(),
+    address: document.getElementById("address").value.trim()
   });
 
   try {
