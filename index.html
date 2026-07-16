@@ -399,7 +399,7 @@
           Leave your info below and Tyler will personally reach out — usually within the hour during business hours.
         </p>
 
-        <form id="leadForm">
+        <form id="leadForm" method="post" action="javascript:void(0)">
           <!-- Honeypot field (spam trap): humans won't fill this -->
           <div style="position:absolute; left:-5000px; opacity:0; height:0; overflow:hidden;">
             <label>Website <input type="text" name="website" id="website" tabindex="-1" autocomplete="off"></label>
@@ -768,7 +768,7 @@ var errorBox = document.getElementById("errorBox");
 var errorMsgEl = document.querySelector("#errorBox div");
 var submitBtn = document.getElementById("submitBtn");
 
-form.addEventListener("submit", async function(e) {
+if (form) { form.addEventListener("submit", async function(e) {
   e.preventDefault();
   thanks.style.display = "none";
   errorBox.style.display = "none";
@@ -834,9 +834,9 @@ form.addEventListener("submit", async function(e) {
     errorBox.style.display = "block";
   } finally {
     submitBtn.disabled = false;
-    submitBtn.textContent = "Get My Free Savings Estimate →";
+    submitBtn.textContent = "Get My Free Savings Estimate \u2192";
   }
-});
+}); } // end if(form)
 </script>
 
 <!-- Google Places Autocomplete -->
