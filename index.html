@@ -12,7 +12,7 @@ const scriptURL = "https://script.google.com/macros/s/AKfycbwgJ1czBkad75OXkxhkXd
 const YT_ID = "3u5DALLHZDI";
 const YT_EMBED_MUTED = "https://www.youtube.com/embed/" + YT_ID + "?autoplay=1&mute=1&rel=0&playsinline=1&enablejsapi=1";
 
-function phoneDigits(raw) { return (raw || "").replace(/\D/g, ""); }
+function phoneDigits(raw) { return String(raw || "").replace(/\D/g, ""); }
 function isValidUS10(d) {
   if (!d || d.length !== 10) return false;
   return (d.charCodeAt(0)-48) >= 2 && (d.charCodeAt(3)-48) >= 2;
@@ -34,13 +34,13 @@ if (phoneEl) {
   phoneEl.addEventListener("keydown", function(e) { if (!isAllowedKey(e)) e.preventDefault(); });
   ["input","change","blur"].forEach(function(evt) {
     phoneEl.addEventListener(evt, function() {
-      phoneEl.value = formatUSPhone(phoneDigits(phoneEl.value));
+      phoneEl.value = formatUSPhone(phoneDigits(String(phoneEl.value)));
     });
   });
   phoneEl.addEventListener("paste", function(e) {
     e.preventDefault();
     var t = (e.clipboardData || window.clipboardData).getData("text") || "";
-    phoneEl.value = formatUSPhone(phoneDigits(t).slice(0,10));
+    phoneEl.value = formatUSPhone(phoneDigits(String(t)).slice(0,10));
   });
 }
 
