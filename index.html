@@ -840,11 +840,12 @@ form.addEventListener("submit", async function(e) {
 </script>
 
 <!-- Google Places Autocomplete -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8hW-T2jGUuStysNdkWgSyzfdnHIGtDPA&libraries=places&callback=initAutocomplete" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8hW-T2jGUuStysNdkWgSyzfdnHIGtDPA&libraries=places" async defer></script>
 <script>
-function initAutocomplete() {
+window.addEventListener("load", function() {
   var addressEl = document.getElementById("address");
   if (!addressEl) return;
+  if (typeof google === "undefined" || !google.maps || !google.maps.places) return;
   var autocomplete = new google.maps.places.Autocomplete(addressEl, {
     types: ["address"],
     componentRestrictions: { country: "us" },
@@ -856,7 +857,7 @@ function initAutocomplete() {
       addressEl.value = place.formatted_address;
     }
   });
-}
+});
 </script>
 
 </body>
