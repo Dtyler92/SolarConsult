@@ -768,8 +768,11 @@ var errorBox = document.getElementById("errorBox");
 var errorMsgEl = document.querySelector("#errorBox div");
 var submitBtn = document.getElementById("submitBtn");
 
+var _submitting = false;
 if (form) { form.addEventListener("submit", async function(e) {
   e.preventDefault();
+  if (_submitting) return;
+  _submitting = true;
   thanks.style.display = "none";
   errorBox.style.display = "none";
   submitBtn.disabled = true;
@@ -833,6 +836,7 @@ if (form) { form.addEventListener("submit", async function(e) {
     errorMsgEl.innerHTML = "Please try again, or contact us: <a href='mailto:tyler@tourbillionenergy.com'>tyler@tourbillionenergy.com</a> &bull; <a href='tel:+17172561092'>(717) 256-1092</a>";
     errorBox.style.display = "block";
   } finally {
+    _submitting = false;
     submitBtn.disabled = false;
     submitBtn.textContent = "Get My Free Savings Estimate \u2192";
   }
